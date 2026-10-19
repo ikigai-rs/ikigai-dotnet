@@ -1,0 +1,13 @@
+# Line endings. A Windows checkout with core.autocrlf=true would otherwise rewrite the vector files to CRLF, and
+# ikigai-devtools' vector-drift compares them BYTE FOR BYTE against core's, so a CRLF checkout reads as drift.
+# `eol=lf` on a path overrides core.autocrlf for it. C# sources are LF too, so one rule holds everywhere.
+* text=auto eol=lf
+tests/vectors/*.json   text eol=lf
+tests/vectors/SHA256SUMS text eol=lf
+*.cs     text eol=lf
+*.csproj text eol=lf
+*.sln    text eol=lf
+*.props  text eol=lf
+*.md     text eol=lf
+*.yml    text eol=lf
+*.ps1    text eol=lf

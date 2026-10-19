@@ -1,0 +1,20 @@
+name: CI
+on:
+  push: { branches: [main] }
+  pull_request:
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}   # never cancel main
+jobs:
+  # Phase 0 (ikigai-devtools claude/research/ikigai-dotnet-plan-2026-10-18.md): the shared vectors, verbatim from
+  # ikigai-core, with LF line endings. The .NET build and test jobs (Windows, Linux, macOS, net48 on Windows) and the
+  # Rust interop job arrive with phase 1, and branch protection names each one as it lands.
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Vector files match the recorded core digests
+        run: cd tests/vectors && sha256sum -c SHA256SUMS
+      - name: Vector files are LF only
+        run: |
+          if grep -l $'\r' tests/vectors/*.json; then echo "CRLF in a vector file"; exit 1; fi
