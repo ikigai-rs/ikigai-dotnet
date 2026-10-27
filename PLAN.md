@@ -79,6 +79,9 @@ FAILURE, not a skip.
    byte vectors below.
 2. **Contracts and capabilities**: v1 and v2 digests, the `ik:` Turtle mirror (`ik:mayFail` included), the capability
    coverage, floor and denial rules, and the validation checker. Passes the four vector files.
+   The v2 hash includes the existence-sensitivity tail: the byte `2`, fed after the failure classes, only when an
+   action's `existence_sensitive` is true (absent and `false` feed nothing); see "Existence sensitivity" in core's
+   `crates/ikigai-vocab/tests/vectors/README.md` and the `sensitive/*` contracts.
 3. **Unix-socket client** (modern target), with interop against the Rust door in CI.
 4. **Servable peer** (modern target): a Rust kernel mounts a .NET door and calls it.
 5. **QUIC client** (modern target, where MsQuic exists); it pins the server certificate, as the other faces do.
