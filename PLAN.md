@@ -22,7 +22,8 @@ for byte across the repositories:
 | QUIC client | `quic.py` (extra) | none | `QuicClient` (modern .NET only) |
 
 The shared vectors live in `tests/vectors/`, copied verbatim from ikigai-core:
-- `contract_vectors.json`, `capability_vectors.json`, `validation_vectors.json`, `failure_class_vectors.json`;
+- `contract_vectors.json` (with `contract_cases.json`, the cases core computes it from), `capability_vectors.json`,
+  `validation_vectors.json`, `failure_class_vectors.json`;
 - pinned values beyond the files: the wire fixture's IRI and endpoint id, the v8 `Conflict` byte vector `05 08 01 78`,
   and the typed-error display form of every wire variant;
 - wire v9's `IssueWith` and the new error tags, as byte vectors (below).
@@ -82,6 +83,13 @@ FAILURE, not a skip.
    The v2 hash includes the existence-sensitivity tail: the byte `2`, fed after the failure classes, only when an
    action's `existence_sensitive` is true (absent and `false` feed nothing); see "Existence sensitivity" in core's
    `crates/ikigai-vocab/tests/vectors/README.md` and the `sensitive/*` contracts.
+   After that comes the body-reader tail: when some input declares `reads_body: true`, the contract is digested in the
+   v2 form, and after the failure classes and the existence-sensitivity tail the hash is fed the byte `3`, then
+   `feed_set` of the flagged inputs' NAMES (sorted, deduplicated, count-prefixed, each length-prefixed, as `requires`
+   is fed). The flag is not part of an input's own encoding, and an absent flag or an explicit `false` feeds nothing,
+   so no other digest moves. The Turtle mirror emits `ik:readsBody true` on endpoint and action input nodes, and no
+   triple for an absent or `false` flag. See "Inputs read as a body" in core's vectors README, the `body/*` contracts
+   and the `core/reads-body` door. Until this face mirrors both, no door it serves may declare `reads_body`.
 3. **Unix-socket client** (modern target), with interop against the Rust door in CI.
 4. **Servable peer** (modern target): a Rust kernel mounts a .NET door and calls it.
 5. **QUIC client** (modern target, where MsQuic exists); it pins the server certificate, as the other faces do.
