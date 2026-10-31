@@ -24,6 +24,11 @@ code yet.
 Applications built on this face live in their own repositories and depend on its package; they are not part of this
 one.
 
+## Accessibility
+
+[ACCESSIBILITY.md](ACCESSIBILITY.md) says what this face emits that people read (nothing yet, at phase 0), the rules
+its output is planned to follow, what is tested, and how to report a barrier.
+
 ## License
 
 MIT OR Apache-2.0, like the other faces.
