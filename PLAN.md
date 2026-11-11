@@ -13,7 +13,7 @@ for byte across the repositories:
 | part | python | deno | .NET |
 | --- | --- | --- | --- |
 | postcard codec (the wire's byte format) | `postcard.py` | `postcard.ts` | `Postcard` |
-| wire frames and typed errors (v9: `IssueWith`, error tags 0–13) | `wire.py` | `wire.ts` | `Wire` |
+| wire frames and typed errors (v9: `IssueWith`, error tags 0–14) | `wire.py` | `wire.ts` | `Wire` |
 | contract digests (v1 and v2), the `ik:` Turtle mirror | `contract.py` | `contract.ts` | `Contract` |
 | capability coverage, floor and denial rules | `capability.py` | in `contract.ts` | `Capability` |
 | IRIs and templates | `template.py` | `iri.ts`, `template.ts` | `Iri`, `Template` |
@@ -21,9 +21,15 @@ for byte across the repositories:
 | servable peer | `serve.py` | `serve.ts` | `Peer` |
 | QUIC client | `quic.py` (extra) | none | `QuicClient` (modern .NET only) |
 
+Phase 1 must also read and display ikigai-core 0.3.5's `gave-up` error: class `transient`, wire tag `14`,
+HTTP 503 with no `Retry-After`, and JSON fields `attempts` and `elapsed_ms`. Elapsed time is in whole milliseconds
+rounded down. Display is `gave up after N attempts over T ms: …`, with `1 attempt` in the singular. The
+failure-class cases and vectors pin the display, JSON round trip, attempt count and elapsed time, alongside all
+older variants. The error's Turtle face must carry both numbers too. No typed errors are implemented at phase 0.
+
 The shared vectors live in `tests/vectors/`, copied verbatim from ikigai-core:
 - `contract_vectors.json` (with `contract_cases.json`, the cases core computes it from), `capability_vectors.json`,
-  `validation_vectors.json`, `failure_class_vectors.json`;
+  `validation_vectors.json`, `failure_class_vectors.json` (with `failure_class_cases.json`);
 - pinned values beyond the files: the wire fixture's IRI and endpoint id, the v8 `Conflict` byte vector `05 08 01 78`,
   and the typed-error display form of every wire variant;
 - wire v9's `IssueWith` and the new error tags, as byte vectors (below).
@@ -90,6 +96,13 @@ FAILURE, not a skip.
    so no other digest moves. The Turtle mirror emits `ik:readsBody true` on endpoint and action input nodes, and no
    triple for an absent or `false` flag. See "Inputs read as a body" in core's vectors README, the `body/*` contracts
    and the `core/reads-body` door. Until this face mirrors both, no door it serves may declare `reads_body`.
+   Resend declarations (ikigai-core 0.3.4) also select v2: after the earlier tails (including byte `4` for
+   inputs fixed by a named request, when present), feed byte `5`, then byte `0` for `"resend": "safe"`, or byte `1`
+   and the length-prefixed input name for `"resend": {"key": "name"}`. Absent or `null` feeds nothing and means
+   **not safe**, regardless of the verb. The six `resend/*` contracts pin compatibility and composition with
+   failures and existence sensitivity. The `core/resend` door pins `ik:resendSafe true` and `ik:resendKey` on
+   action nodes; the latter refers to that contract's own input node. These vectors are carried at phase 0;
+   this repository has no implementation of contract computation or resend-safety queries yet.
 3. **Unix-socket client** (modern target), with interop against the Rust door in CI.
 4. **Servable peer** (modern target): a Rust kernel mounts a .NET door and calls it.
 5. **QUIC client** (modern target, where MsQuic exists); it pins the server certificate, as the other faces do.
