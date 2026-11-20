@@ -27,6 +27,15 @@ rounded down. Display is `gave up after N attempts over T ms: …`, with `1 atte
 failure-class cases and vectors pin the display, JSON round trip, attempt count and elapsed time, alongside all
 older variants. The error's Turtle face must carry both numbers too. No typed errors are implemented at phase 0.
 
+Phase 1 must also read ikigai-core 0.4.0's floor-refusal scopes (ledger #3840): a `denied` error's JSON face may
+carry `"lacking": ["<scope IRI>", …]`, every scope the kernel's declared capability floor found missing, in
+declaration order and spelled as declared (a family keeps its `*`). Decoding reads it as an optional list of strings
+and exposes an empty list when it is absent; a `denied` without it decodes exactly as before. Encoding, including
+when the peer serves an error, writes `lacking` only when the list is not empty, so an endpoint's own run-time
+refusal and the plain `denied` row stay byte-identical. Kind, class, display, wire tag 4 and HTTP 403 are unchanged.
+The `denied-by-the-floor` row in the failure-class cases and vectors pins this, and a round-trip test must show
+`lacking` survives decode and encode.
+
 The shared vectors live in `tests/vectors/`, copied verbatim from ikigai-core:
 - `contract_vectors.json` (with `contract_cases.json`, the cases core computes it from), `capability_vectors.json`,
   `validation_vectors.json`, `failure_class_vectors.json` (with `failure_class_cases.json`);
