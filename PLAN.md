@@ -107,10 +107,12 @@ FAILURE, not a skip.
    and the `core/reads-body` door. Until this face mirrors both, no door it serves may declare `reads_body`.
    Resend declarations (ikigai-core 0.3.4) also select v2: after the earlier tails (including byte `4` for
    inputs fixed by a named request, when present), feed byte `5`, then byte `0` for `"resend": "safe"`, or byte `1`
-   and the length-prefixed input name for `"resend": {"key": "name"}`. Absent or `null` feeds nothing and means
-   **not safe**, regardless of the verb. The six `resend/*` contracts pin compatibility and composition with
-   failures and existence sensitivity. The `core/resend` door pins `ik:resendSafe true` and `ik:resendKey` on
-   action nodes; the latter refers to that contract's own input node. These vectors are carried at phase 0;
+   and the length-prefixed input name for `"resend": {"key": "name"}`, or byte `2` for `"resend": "unsafe"`.
+   Absent or `null` feeds nothing; the resend decision then defaults to safe for Source, Exists, Meta and Delete,
+   and unsafe for Sink. Validation rejects an unsafe declaration on a read. The `resend/*` contracts pin
+   compatibility and composition with failures and existence sensitivity. The Turtle mirror emits
+   `ik:resendSafe true` or `ik:resendSafe false` for explicit safe or unsafe declarations, and `ik:resendKey`
+   for a key, referring to that contract's own input node. These vectors are carried at phase 0;
    this repository has no implementation of contract computation or resend-safety queries yet.
 3. **Unix-socket client** (modern target), with interop against the Rust door in CI.
 4. **Servable peer** (modern target): a Rust kernel mounts a .NET door and calls it.
